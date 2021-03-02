@@ -30,7 +30,14 @@ public:
 
 private:
 
+	UPROPERTY()
+	bool bPlateMoving;
+
+	UPROPERTY()
 	bool bStepped;
+
+	UPROPERTY()
+	FVector NormalPlateLocation;
 
 protected:
 	// Called when the game starts or when spawned

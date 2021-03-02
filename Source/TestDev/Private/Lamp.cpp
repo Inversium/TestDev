@@ -25,11 +25,14 @@ ALamp::ALamp()
 
 	LampLight->SetIntensity(0.0);
 	bLampActive = false;
-	InitialColor = FLinearColor::White;
-	CurrentColor = InitialColor;
-	ColorChangeSpeed = 5.0;
-	
-	
+	bRandomInitialColor = false;
+	InitialColor = FLinearColor::Red;
+	ColorChangeSpeed = 5.0;	
+
+	if (bRandomInitialColor)
+		CurrentColor = FLinearColor::MakeRandomColor();
+	else
+		CurrentColor = InitialColor;
 }
 
 // Called when the game starts or when spawned
@@ -51,6 +54,8 @@ void ALamp::BeginPlay()
 	LampMID = UMaterialInstanceDynamic::Create(LampMesh->GetMaterial(0), this);
 	LampMID->SetScalarParameterValue(TEXT("Emissive Power"), 0.0);
 	LampMesh->SetMaterial(0, LampMID);
+
+	
 }
 
 // Called every frame

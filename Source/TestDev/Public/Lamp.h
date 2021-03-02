@@ -33,6 +33,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Lamp")
 	float ColorChangeSpeed;
 
+	/* Whether to choose initial color randomly or to use InitialColor */
+	UPROPERTY(BlueprintReadonly, EditAnywhere, Category = "Lamp")
+	bool bRandomInitialColor;
+
 private:
 	
 	/* Whether the lamp is active */

@@ -15,11 +15,14 @@ APressurePlate::APressurePlate()
 	PlateMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Plate Mesh"));
 	PlateCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Plate Collision"));
 
-	RootComponent = PlateMesh;
-	PlateCollision->SetupAttachment(PlateMesh);
+	RootComponent = PlateCollision;
+	PlateMesh->SetupAttachment(PlateCollision);
 
 	SetReplicates(true);
-	
+
+	bStepped = false;
+	bPlateMoving = false;
+	NormalPlateLocation = PlateMesh->GetRelativeLocation();
 }
 
 // Called when the game starts or when spawned
@@ -36,6 +39,29 @@ void APressurePlate::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bPlateMoving)
+	{
+		if (bStepped)
+		{
+			/* Update plate position when player stepped on it */
+			FVector Target = NormalPlateLocation - FVector(0.0, 0.0, 12.0);
+			FVector NewPosition = FMath::VInterpTo(PlateMesh->GetRelativeLocation(), Target, DeltaTime, 20.0);
+			PlateMesh->SetRelativeLocation(NewPosition);
+
+			/* Disable movement when target achieved */
+			if (FVector::PointsAreNear(Target, NewPosition, 0.1)) bPlateMoving = false;
+		}
+		else
+		{
+			/* Update plate position when player left it */
+			FVector Target = NormalPlateLocation;
+			FVector NewPosition = FMath::VInterpTo(PlateMesh->GetRelativeLocation(), Target, DeltaTime, 20.0);
+			PlateMesh->SetRelativeLocation(NewPosition);
+
+			/* Disable movement when target achieved */
+			if (FVector::PointsAreNear(Target, NewPosition, 0.1)) bPlateMoving = false;
+		}
+	}
 }
 
 
@@ -43,17 +69,23 @@ void APressurePlate::OnTriggerEntered(class UPrimitiveComponent* OverlappedComp,
 {
 	ATestDevCharacter* Character = Cast<ATestDevCharacter>(OtherActor);
 
-	if (HasAuthority())
+	if (HasAuthority() && Character)
 	{
 		OnPlateEntered.Broadcast();
+		bStepped = true;
+		bPlateMoving = true;
 	}
 }
 
 
 void APressurePlate::OnTriggerLeaved(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (HasAuthority())
+	ATestDevCharacter* Character = Cast<ATestDevCharacter>(OtherActor);
+
+	if (HasAuthority() && Character)
 	{
 		OnPlateLeaved.Broadcast();
+		bStepped = false;
+		bPlateMoving = true;
 	}
 }
