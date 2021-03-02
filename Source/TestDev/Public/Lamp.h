@@ -15,14 +15,38 @@ public:
 	// Sets default values for this actor's properties
 	ALamp();
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
 	class UStaticMeshComponent* LampMesh;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
 	class UPointLightComponent* LampLight;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	
+	/* Reference to Plate in the level */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Lamp")
 	class APressurePlate* TriggerPlate;
+
+	/* Initial Lamp Color */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Lamp")
+	FLinearColor InitialColor;
+
+	/* Speed at which lamp color changes (percents per second) */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Lamp")
+	float ColorChangeSpeed;
+
+private:
+	
+	/* Whether the lamp is active */
+	UPROPERTY()
+	bool bLampActive;
+
+	/* Curernt color of the lamp */
+	UPROPERTY()
+	FLinearColor CurrentColor;
+
+	/* Lamp dynamic material */
+	UPROPERTY()
+	class UMaterialInstanceDynamic* LampMID;
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -32,11 +56,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-private:
+private: 
 
+	/* Called when Character enters the plate referenced by TriggerPlate */
 	UFUNCTION(NetMulticast, Reliable)
 	void OnTriggerActivated();
 
+	/* Called when Character leaves the plate referenced by TriggerPlate */
 	UFUNCTION(NetMulticast, Reliable)
 	void OnTriggerDisactivated();
 
