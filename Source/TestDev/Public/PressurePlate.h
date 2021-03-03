@@ -54,7 +54,4 @@ private:
 
 	UFUNCTION()
 	void OnTriggerLeaved(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-	
-	
-
 };
