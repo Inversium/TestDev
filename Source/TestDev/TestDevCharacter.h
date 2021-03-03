@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Widget/TestDevWidget.h"
 #include "TestDevCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -18,6 +19,11 @@ class ATestDevCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	/* Player Nickname */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TestDevCharacter", meta = (AllowPrivateAccess = "true"))
+	FName Nickname;
+
 public:
 	ATestDevCharacter();
 
@@ -29,7 +35,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	/* Class overriding the TestDevWidget class */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetClasses")
+	TSubclassOf<UTestDevWidget> TestDevWidgetClass;
+
 protected:
+
+	virtual void BeginPlay() override;
 
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
@@ -68,5 +80,7 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	FName GetPlayerNickname() const { return Nickname; }
 };
 

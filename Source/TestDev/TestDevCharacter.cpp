@@ -8,6 +8,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/WidgetComponent.h"
+
 
 //////////////////////////////////////////////////////////////////////////
 // ATestDevCharacter
@@ -20,6 +22,9 @@ ATestDevCharacter::ATestDevCharacter()
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
+
+	Nickname = FName(NAME_None);
+	TestDevWidgetClass = UTestDevWidget::StaticClass();
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
@@ -74,6 +79,20 @@ void ATestDevCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerI
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ATestDevCharacter::OnResetVR);
+}
+
+void ATestDevCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	/* If Nickname is None on startup use object name instead */
+	if (Nickname.IsNone()) Nickname = FName(GetName());
+
+	auto Widget = CreateWidget<UTestDevWidget>(GetWorld(), TestDevWidgetClass, TEXT("TestDevWidget"));
+	if (Widget)
+	{
+		Widget->AddToViewport();
+	}
 }
 
 

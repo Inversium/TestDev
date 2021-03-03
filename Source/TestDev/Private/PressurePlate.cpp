@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
 #include "TestDev/TestDevCharacter.h"
+#include "TestDevGameState.h"
 
 // Sets default values
 APressurePlate::APressurePlate()
@@ -74,6 +75,9 @@ void APressurePlate::OnTriggerEntered(class UPrimitiveComponent* OverlappedComp,
 		OnPlateEntered.Broadcast();
 		bStepped = true;
 		bPlateMoving = true;
+
+		auto GameState = GetWorld()->GetGameState<ATestDevGameState>();
+		if (GameState) GameState->SetPlatePlayerName(Character->GetPlayerNickname());
 	}
 }
 
@@ -87,5 +91,8 @@ void APressurePlate::OnTriggerLeaved(class UPrimitiveComponent* OverlappedComp, 
 		OnPlateLeaved.Broadcast();
 		bStepped = false;
 		bPlateMoving = true;
+
+		auto GameState = GetWorld()->GetGameState<ATestDevGameState>();
+		if (GameState) GameState->SetPlatePlayerName(FName(TEXT("")));
 	}
 }
